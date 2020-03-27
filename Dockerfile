@@ -1,13 +1,14 @@
-FROM rabbitmq:3.7.2-management
+FROM alpine:3.11 as downloader
+
+RUN apk add unzip curl && \
+    curl -L 'https://dl.bintray.com/rabbitmq/community-plugins/3.8.x/rabbitmq_delayed_message_exchange/rabbitmq_delayed_message_exchange-20191008-3.8.x.zip' -o /dmex.zip && \
+    unzip dmex.zip
+
+FROM rabbitmq:3.8.3-management as runtime
 
 MAINTAINER Elders
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends wget \
-    && apt-get install -y p7zip-full
+COPY --from=downloader /rabbitmq_delayed_message_exchange-20191008-3.8.x.ez /plugins/
 
-RUN wget --no-check-certificate https://dl.bintray.com/rabbitmq/community-plugins/3.7.0/rabbitmq_delayed_message_exchange-3.7.0.zip -P usr/lib/rabbitmq/lib/rabbitmq_server-3.7.2/plugins/
-
-RUN 7z e usr/lib/rabbitmq/lib/rabbitmq_server-3.7.2/plugins/rabbitmq_delayed_message_exchange-3.7.0.zip -o/usr/lib/rabbitmq/lib/rabbitmq_server-3.7.2/plugins/
-
-RUN rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+RUN rabbitmq-plugins enable rabbitmq_delayed_message_exchange && \
+    rabbitmq-plugins enable rabbitmq_federation
