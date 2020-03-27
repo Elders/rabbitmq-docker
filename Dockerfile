@@ -11,4 +11,5 @@ MAINTAINER Elders
 COPY --from=downloader /rabbitmq_delayed_message_exchange-20191008-3.8.x.ez /plugins/
 
 RUN rabbitmq-plugins enable rabbitmq_delayed_message_exchange && \
-    rabbitmq-plugins enable rabbitmq_federation
+    rabbitmq-plugins enable rabbitmq_federation && \
+    rabbitmq-plugins enable rabbitmq_federation_management
